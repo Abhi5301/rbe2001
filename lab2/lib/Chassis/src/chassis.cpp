@@ -116,6 +116,7 @@ bool Chassis::ChassisLoop(Twist& velocity)
         retVal = true;
     }
 
+
     return retVal;
 }
 
@@ -146,6 +147,11 @@ Twist Chassis::CalcOdomFromWheelMotion(void)
      * 
      * In that case, you should return a Pose instead of a Twist.
      */
+     //Should be DONE
+
+     velocity.u = (leftMotor.speed/LEFT_TICKS_PER_CM + rightMotor.speed/RIGHT_TICKS_PER_CM)/2.0; //average between the left and right motor; is a difference in cm distance since previous loop
+        // these are not actually velocities, they are position deltas
+     velocity.omega = (rightMotor.speed/RIGHT_TICKS_PER_CM-leftMotor.speed/LEFT_TICKS_PER_CM)/(ROBOT_RADIUS*2.0);
 
 #ifdef __NAV_DEBUG__
     TeleplotPrint("u", velocity.u);

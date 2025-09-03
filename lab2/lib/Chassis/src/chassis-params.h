@@ -3,5 +3,6 @@
  */
 
 const float ROBOT_RADIUS = 7;
-const float LEFT_TICKS_PER_CM = 50;
-const float RIGHT_TICKS_PER_CM = 50;
+const float TICKS_PER_REV = 1440;
+const float LEFT_TICKS_PER_CM = 65;
+const float RIGHT_TICKS_PER_CM = 65;
