@@ -8,6 +8,7 @@ void Robot::InitializeRobot(void)
      * TODO: Set pin 13 HIGH when navigating and LOW when destination is reached.
      * Need to set as OUTPUT here.
      */
+    SetDestination(dests_pose[dests_i]);
 }
 
 void Robot::EnterIdleState(void)
@@ -32,7 +33,11 @@ void Robot::RobotLoop(void)
     {
         // We do FK regardless of state
         UpdatePose(velocity);
-        //chassis.SetMotorEfforts(220,-220);
+        // if(currPose.theta < 62.82){
+        //     chassis.SetMotorEfforts(-80,80);
+        // } else {
+        //     chassis.SetMotorEfforts(0,0);
+        // }
         
         /**
          * Here, we break with tradition and only call these functions if we're in the 

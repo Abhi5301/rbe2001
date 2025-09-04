@@ -149,13 +149,17 @@ Twist Chassis::CalcOdomFromWheelMotion(void)
      */
      //Should be DONE
 
+     // actually x 
      velocity.u = (leftMotor.speed/LEFT_TICKS_PER_CM + rightMotor.speed/RIGHT_TICKS_PER_CM)/2.0; //average between the left and right motor; is a difference in cm distance since previous loop
         // these are not actually velocities, they are position deltas
-     velocity.omega = (rightMotor.speed/RIGHT_TICKS_PER_CM-leftMotor.speed/LEFT_TICKS_PER_CM)/(ROBOT_RADIUS*2.0);
+     // actually theta
+     velocity.omega = (rightMotor.speed/RIGHT_TICKS_PER_CM - leftMotor.speed/LEFT_TICKS_PER_CM)/(ROBOT_RADIUS*2.0);
 
 #ifdef __NAV_DEBUG__
     TeleplotPrint("u", velocity.u);
     TeleplotPrint("omega", velocity.omega);
+    TeleplotPrint("LTick", leftMotor.GetEncoderTotal());
+    TeleplotPrint("RTick", rightMotor.GetEncoderTotal());
 #endif
 
     return velocity;

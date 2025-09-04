@@ -4,26 +4,13 @@
 
 #include "robot.h"
 
-
-
 void Robot::UpdatePose(const Twist& twist)
 {
-    /**
-     * TODO: Add your FK algorithm to update currPose here.
-     */
-    currPose.theta = currPose.theta + twist.omega * 0.5; //incrementing by half the timestep to use the average omega for the x and y calculations
-    currPose.x = currPose.x + twist.u * cos(currPose.theta);
-    currPose.y = currPose.y + twist.v * sin(currPose.theta); 
-    currPose.theta = currPose.theta + twist.omega * 0.5; // incrementing by the other half
 
-    /*
-        TODO:it
-        use the current u forward delta in cm in the robot reference frame and the corresponding difference in angle
-        we take this and brreak down into forwards and sideways differences in the robots position in the robots reference frame
-        take these forward and sideways deltats and do the offcoordinate transformation from robot space to global space
-        recompute location from global space offsets (math above is wrong)
-    */
-
+    currPose.theta += twist.omega * 0.5; //incrementing by half the timestep to use the average omega for the x and y calculations
+    currPose.x += twist.u * cos(currPose.theta);
+    currPose.y += twist.u * sin(currPose.theta); 
+    currPose.theta += twist.omega * 0.5; // incrementing by the other half
 
 #ifdef __NAV_DEBUG__
     TeleplotPrint("x", currPose.x);
@@ -57,6 +44,10 @@ bool Robot::CheckReachedDestination(void)
     /**
      * TODO: Add code to check if you've reached destination here.
      */
+    double error_r = sqrt((destPose.x - currPose.x)*(destPose.x - currPose.x) + (destPose.y - currPose.y)*(destPose.y - currPose.y));
+    if (error_r < 5){
+        retVal = true;
+    }
 
     return retVal;
 }
@@ -65,23 +56,37 @@ void Robot::DriveToPoint(void)
 {
     if(robotState == ROBOT_DRIVE_TO_POINT)
     {
+        double error_r = sqrt((destPose.x - currPose.x)*(destPose.x - currPose.x) + (destPose.y - currPose.y)*(destPose.y - currPose.y));
+        double error_theta = atan2((destPose.y - currPose.y), (destPose.x - currPose.x));
+
+        double left_effort = 0;
+        double right_effort = 0;
+
+        double r_kp = 2;
+        double theta_kp = 1;
+
+        left_effort = error_r * r_kp;// + error_theta * theta_kp;
+        right_effort = error_r * r_kp;// - error_theta * theta_kp;
+
         /**
          * TODO: Add your IK algorithm here. 
          */
 
 #ifdef __NAV_DEBUG__
         // Print useful stuff here.
+        TeleplotPrint("error_r", currPose.x);
+        TeleplotPrint("error_theta", currPose.x);
 #endif
 
         /**
          * TODO: Call chassis.SetMotorEfforts() to command the motion, based on your calculations above.
          */
+        //chassis.SetMotorEfforts(left_effort, right_effort);
     }
 }
 
 void Robot::HandleDestination(void)
 {
-    /**
-     * TODO: Stop and change state. Turn off LED.
-     */
+    dests_i++;
+    SetDestination(dests_pose[dests_i]);  
 }
