@@ -15,7 +15,7 @@ void setup()
 #ifdef __SETUP_DEBUG__
   while(!Serial){delay(5);}
 #endif
-
+  delay(3);
   robot.InitializeRobot();
 }
 

@@ -45,7 +45,8 @@ bool Robot::CheckReachedDestination(void)
      * TODO: Add code to check if you've reached destination here.
      */
     double error_r = sqrt((destPose.x - currPose.x)*(destPose.x - currPose.x) + (destPose.y - currPose.y)*(destPose.y - currPose.y));
-    if (error_r < 5){
+
+    if (error_r < 2){
         retVal = true;
     }
 
@@ -62,11 +63,11 @@ void Robot::DriveToPoint(void)
         double left_effort = 0;
         double right_effort = 0;
 
-        double r_kp = 2;
-        double theta_kp = 1;
+        double r_kp = 0; //9; // <- this is a reasonable value, set to 0 for turning tuning
+        double theta_kp = 0;
 
-        left_effort = error_r * r_kp;// + error_theta * theta_kp;
-        right_effort = error_r * r_kp;// - error_theta * theta_kp;
+        left_effort = error_r * r_kp + error_theta * theta_kp;
+        right_effort = error_r * r_kp - error_theta * theta_kp;
 
         /**
          * TODO: Add your IK algorithm here. 
@@ -74,19 +75,22 @@ void Robot::DriveToPoint(void)
 
 #ifdef __NAV_DEBUG__
         // Print useful stuff here.
-        TeleplotPrint("error_r", currPose.x);
-        TeleplotPrint("error_theta", currPose.x);
+        TeleplotPrint("x", currPose.x);
+        TeleplotPrint("y", currPose.y);
+        TeleplotPrint("error_r", error_r);
+        TeleplotPrint("error_theta", error_theta);
 #endif
 
         /**
          * TODO: Call chassis.SetMotorEfforts() to command the motion, based on your calculations above.
          */
-        //chassis.SetMotorEfforts(left_effort, right_effort);
+        chassis.SetMotorEfforts(left_effort, right_effort);
     }
 }
 
 void Robot::HandleDestination(void)
 {
-    dests_i++;
-    SetDestination(dests_pose[dests_i]);  
+    EnterIdleState();
+    // dests_i++;
+    // SetDestination(dests_pose[dests_i]);  
 }

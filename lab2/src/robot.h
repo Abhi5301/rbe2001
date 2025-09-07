@@ -33,7 +33,8 @@ public:
     void InitializeRobot(void);
     void RobotLoop(void);
 
-    const Pose dests_pose[3] = {Pose(30, 30, 0), Pose(60, -30, 0), Pose(60, 30, 0)};
+    //const Pose dests_pose[3] = {Pose(30, 30, 0), Pose(60, -30, 0), Pose(60, 30, 0)};
+    const Pose dests_pose[1] = {Pose(0, 10, 0)};
     int dests_i = 0;
 
 protected:

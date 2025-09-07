@@ -9,6 +9,7 @@ void Robot::InitializeRobot(void)
      * Need to set as OUTPUT here.
      */
     SetDestination(dests_pose[dests_i]);
+    robotState = ROBOT_DRIVE_TO_POINT;
 }
 
 void Robot::EnterIdleState(void)
@@ -49,7 +50,7 @@ void Robot::RobotLoop(void)
         if(robotState == ROBOT_DRIVE_TO_POINT)
         {
             DriveToPoint();
-            if(CheckReachedDestination()) HandleDestination();
+            if(CheckReachedDestination()){ HandleDestination();};
         }
     }
 }
