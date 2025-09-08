@@ -46,7 +46,7 @@ bool Robot::CheckReachedDestination(void)
      */
     double error_r = sqrt((destPose.x - currPose.x)*(destPose.x - currPose.x) + (destPose.y - currPose.y)*(destPose.y - currPose.y));
 
-    if (error_r < 2){
+    if (error_r < 9){
         retVal = true;
     }
 
@@ -58,16 +58,21 @@ void Robot::DriveToPoint(void)
     if(robotState == ROBOT_DRIVE_TO_POINT)
     {
         double error_r = sqrt((destPose.x - currPose.x)*(destPose.x - currPose.x) + (destPose.y - currPose.y)*(destPose.y - currPose.y));
-        double error_theta = atan2((destPose.y - currPose.y), (destPose.x - currPose.x));
+        double error_theta = atan2((destPose.y - currPose.y), (destPose.x - currPose.x))-currPose.theta;
 
         double left_effort = 0;
         double right_effort = 0;
 
-        double r_kp = 0; //9; // <- this is a reasonable value, set to 0 for turning tuning
-        double theta_kp = 0;
+        double r_kp = 3; //9; // <- this is a reasonable value, set to 0 for turning tuning
+        double theta_kp = 120;
 
-        left_effort = error_r * r_kp + error_theta * theta_kp;
-        right_effort = error_r * r_kp - error_theta * theta_kp;
+        if(abs(error_theta)<0.4){
+            left_effort += error_r * r_kp*abs(cos(error_theta));
+            right_effort += error_r * r_kp*abs(cos(error_theta));
+        }
+
+        left_effort -= error_theta * theta_kp;
+        right_effort += error_theta * theta_kp;
 
         /**
          * TODO: Add your IK algorithm here. 
@@ -81,9 +86,6 @@ void Robot::DriveToPoint(void)
         TeleplotPrint("error_theta", error_theta);
 #endif
 
-        /**
-         * TODO: Call chassis.SetMotorEfforts() to command the motion, based on your calculations above.
-         */
         chassis.SetMotorEfforts(left_effort, right_effort);
     }
 }
@@ -91,6 +93,10 @@ void Robot::DriveToPoint(void)
 void Robot::HandleDestination(void)
 {
     EnterIdleState();
-    // dests_i++;
-    // SetDestination(dests_pose[dests_i]);  
+    if(dests_i == 2) {
+        robotState = ROBOT_IDLE;
+    } else {
+        dests_i++;
+        SetDestination(dests_pose[dests_i]);
+    }  
 }

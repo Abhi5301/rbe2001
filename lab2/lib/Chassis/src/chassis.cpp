@@ -158,8 +158,6 @@ Twist Chassis::CalcOdomFromWheelMotion(void)
 #ifdef __NAV_DEBUG__
     TeleplotPrint("u", velocity.u);
     TeleplotPrint("omega", velocity.omega);
-    TeleplotPrint("LTick", leftMotor.GetEncoderTotal());
-    TeleplotPrint("RTick", rightMotor.GetEncoderTotal());
 #endif
 
     return velocity;
