@@ -4,12 +4,8 @@ void Robot::InitializeRobot(void)
 {
     chassis.InititalizeChassis();
 
-    /**
-     * TODO: Set pin 13 HIGH when navigating and LOW when destination is reached.
-     * Need to set as OUTPUT here.
-     */
-    SetDestination(dests_pose[dests_i]);
-    robotState = ROBOT_DRIVE_TO_POINT;
+    //SetDestination(dests_pose[dests_i]);
+    //robotState = ROBOT_DRIVE_TO_POINT;
 }
 
 void Robot::EnterIdleState(void)
@@ -39,7 +35,13 @@ void Robot::RobotLoop(void)
         // } else {
         //     chassis.SetMotorEfforts(0,0);
         // }
-        
+        if(robotState == ROBOT_IDLE) {
+            if(digitalRead(14) == LOW){
+                delay(2000);
+                SetDestination(dests_pose[dests_i]);
+                robotState = ROBOT_DRIVE_TO_POINT;
+            }
+        }
         /**
          * Here, we break with tradition and only call these functions if we're in the 
          * DRIVE_TO_POINT state. CheckReachedDestination() is expensive, so we don't want
