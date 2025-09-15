@@ -6,7 +6,7 @@
 
 void Robot::UpdatePose(const Twist& twist)
 {
-
+    //Second order calculation
     currPose.theta += twist.omega * 0.5; //incrementing by half the timestep to use the average omega for the x and y calculations
     currPose.x += twist.u * cos(currPose.theta);
     currPose.y += twist.u * sin(currPose.theta); 
@@ -20,10 +20,52 @@ void Robot::UpdatePose(const Twist& twist)
         currPose.theta += 2*M_PI;
     }
 
+    //First order calculation
+    currPose1.theta += twist.omega;
+    currPose1.x += twist.u * cos(currPose1.theta);
+    currPose1.y += twist.u * sin(currPose1.theta);
+
+    if(currPose1.theta > M_PI){
+        currPose1.theta -= 2*M_PI;
+    }
+    if(currPose1.theta < -M_PI){
+        currPose1.theta += 2*M_PI;
+    }
+
+    //Instantanous Circle Calculation
+
+    if(twist.omega == 0){
+        currPoseCir.x += twist.u * cos(currPoseCir.theta);
+        currPoseCir.y += twist.u * sin(currPoseCir.theta);
+    } else {
+        float R = (twist.u)/(twist.omega);  
+        float startTheta = currPoseCir.theta;
+        currPoseCir.theta += twist.omega;
+        currPoseCir.x += R * (sin(currPoseCir.theta) - sin(startTheta));
+        currPoseCir.y += R * (cos(startTheta) - cos(currPoseCir.theta));
+
+        if(currPoseCir.theta > M_PI){
+            currPoseCir.theta -= 2*M_PI;
+        }
+        if(currPoseCir.theta < -M_PI){
+            currPoseCir.theta += 2*M_PI;
+        }
+    }
+    
+
+
 #ifdef __NAV_DEBUG__
-    TeleplotPrint("x", currPose.x);
-    TeleplotPrint("y", currPose.y);
-    TeleplotPrint("theta", currPose.theta);
+    TeleplotPrint("secOrdX", currPose.x);
+    TeleplotPrint("secOrdY", currPose.y);
+    TeleplotPrint("secOrdTheta", currPose.theta);
+
+    TeleplotPrint("firOrdX", currPose1.x);
+    TeleplotPrint("firOrdY", currPose1.y);
+    TeleplotPrint("firOrdTheta", currPose1.theta);
+
+    TeleplotPrint("cirX", currPoseCir.x);
+    TeleplotPrint("cirY", currPoseCir.y);
+    TeleplotPrint("cirTheta", currPoseCir.theta);
 #endif
 
 }
@@ -66,19 +108,19 @@ void Robot::DriveToPoint(void)
     if(robotState == ROBOT_DRIVE_TO_POINT)
     {
         double error_r = sqrt((destPose.x - currPose.x)*(destPose.x - currPose.x) + (destPose.y - currPose.y)*(destPose.y - currPose.y));
-        double error_theta = atan2((destPose.y - currPose.y), (destPose.x - currPose.x))-currPose.theta;
+        double error_theta = atan2((destPose.y - currPose.y), (destPose.x - currPose.x)) - currPose.theta;
 
-        if (error_theta > M_PI){
-            error_theta -= 2 * M_PI;
+        if (error_theta > PI){
+            error_theta -= 2 * PI;
         }
-        if (error_theta < -M_PI){
-            error_theta += 2 * M_PI;
+        if (error_theta < -PI){
+            error_theta += 2 * PI;
         }
 
         double left_effort = 0;
         double right_effort = 0;
 
-        double r_kp = 7; //9; // <- this is a reasonable value, set to 0 for turning tuning
+        double r_kp = 7;
         double theta_kp = 300;
 
         if(error_r > 50){
@@ -94,16 +136,6 @@ void Robot::DriveToPoint(void)
 
         left_effort += error_r * r_kp*abs(cos(error_theta));
         right_effort += error_r * r_kp*abs(cos(error_theta));
-
-        /*
-        if(abs(error_theta)<0.4){
-            left_effort += error_r * r_kp*abs(cos(error_theta));
-            right_effort += error_r * r_kp*abs(cos(error_theta));
-        } else {
-            left_effort += error_r * r_kp*abs(cos(error_theta))*abs(cos(error_theta-0.4))*0.2;
-            right_effort += error_r * r_kp*abs(cos(error_theta))*abs(cos(error_theta-0.4))*0.2;
-        }
-        */
 
         left_effort -= error_theta * theta_kp;
         right_effort += error_theta * theta_kp;

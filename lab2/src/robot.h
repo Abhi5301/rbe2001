@@ -26,6 +26,8 @@ protected:
      * For tracking current pose and the destination.
      */
     Pose currPose;
+    Pose currPoseCir;
+    Pose currPose1;
     Pose destPose;
     
 public:
