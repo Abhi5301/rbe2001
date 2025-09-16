@@ -55,6 +55,7 @@ void Robot::UpdatePose(const Twist& twist)
 
 
 #ifdef __NAV_DEBUG__
+    
     TeleplotPrint("secOrdX", currPose.x);
     TeleplotPrint("secOrdY", currPose.y);
     TeleplotPrint("secOrdTheta", currPose.theta);
@@ -66,6 +67,18 @@ void Robot::UpdatePose(const Twist& twist)
     TeleplotPrint("cirX", currPoseCir.x);
     TeleplotPrint("cirY", currPoseCir.y);
     TeleplotPrint("cirTheta", currPoseCir.theta);
+    
+    TeleplotPrint("secOrdX - firOrderX", currPose.x - currPose1.x);
+    TeleplotPrint("secOrdY - firOrderY", currPose.y - currPose1.y);
+    TeleplotPrint("secOrdTheta - firOrderTheta", currPose.theta - currPose1.theta);
+
+    TeleplotPrint("secOrdX - cirX", currPose.x - currPoseCir.x);
+    TeleplotPrint("secOrdY - cirY", currPose.y - currPoseCir.y);
+    TeleplotPrint("secOrdTheta - cirTheta", currPose.theta - currPoseCir.theta);
+
+    TeleplotPrint("firOrdX - cirX", currPose1.x - currPoseCir.x);
+    TeleplotPrint("firOrdY - cirY", currPose1.y - currPoseCir.y);
+    TeleplotPrint("firOrdTheta - cirTheta", currPose1.theta - currPoseCir.theta);
 #endif
 
 }
@@ -96,7 +109,7 @@ bool Robot::CheckReachedDestination(void)
      */
     double error_r = sqrt((destPose.x - currPose.x)*(destPose.x - currPose.x) + (destPose.y - currPose.y)*(destPose.y - currPose.y));
 
-    if (error_r < 3){
+    if (error_r < 1){
         retVal = true;
     }
 
@@ -120,19 +133,8 @@ void Robot::DriveToPoint(void)
         double left_effort = 0;
         double right_effort = 0;
 
-        double r_kp = 7;
-        double theta_kp = 300;
-
-        if(error_r > 50){
-            error_r = 50;
-        }
-        if(abs(error_theta) > 50){
-            if(error_theta > 0){
-                error_theta = 50;
-            } else {
-                error_theta = -50;
-            }
-        }
+        double r_kp = 20;
+        double theta_kp = 2000;
 
         left_effort += error_r * r_kp*abs(cos(error_theta));
         right_effort += error_r * r_kp*abs(cos(error_theta));
@@ -164,10 +166,12 @@ void Robot::DriveToPoint(void)
 
 #ifdef __NAV_DEBUG__
         // Print useful stuff here.
+        /*
         TeleplotPrint("x", currPose.x);
         TeleplotPrint("y", currPose.y);
         TeleplotPrint("error_r", error_r);
         TeleplotPrint("error_theta", error_theta);
+        */
 #endif
 
         chassis.SetMotorEfforts(left_effort, right_effort);
