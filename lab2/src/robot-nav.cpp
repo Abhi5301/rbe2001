@@ -7,11 +7,16 @@
 void Robot::UpdatePose(const Twist& twist)
 {
     //Second order calculation
-    currPose.theta += twist.omega * 0.5; //incrementing by half the timestep to use the average omega for the x and y calculations
+
+    //Incrementing by half the timestep to use the average omega for the x and y calculations
+    currPose.theta += twist.omega * 0.5;
+    //Uses the forward distance travelled (u) and transforms it into the lab reference frame using theta
     currPose.x += twist.u * cos(currPose.theta);
     currPose.y += twist.u * sin(currPose.theta); 
-    currPose.theta += twist.omega * 0.5; // incrementing by the other half
+    // Incrementing by the other half of the timestep to complete the second order calculation
+    currPose.theta += twist.omega * 0.5;
 
+    //Handles the heading discontinuity and wraps the theta to between ±π;
     if(currPose.theta > M_PI){
         currPose.theta -= 2*M_PI;
         circle++;
@@ -33,7 +38,6 @@ void Robot::UpdatePose(const Twist& twist)
     }
 
     //Instantanous Circle Calculation
-
     if(twist.omega == 0){
         currPoseCir.x += twist.u * cos(currPoseCir.theta);
         currPoseCir.y += twist.u * sin(currPoseCir.theta);
@@ -88,9 +92,6 @@ void Robot::UpdatePose(const Twist& twist)
  */
 void Robot::SetDestination(const Pose& dest)
 {
-    /**
-     * TODO: Turn on LED, as well.
-     */
     Serial.print("Setting dest to: ");
     Serial.print(dest.x);
     Serial.print(", ");
@@ -104,10 +105,10 @@ void Robot::SetDestination(const Pose& dest)
 bool Robot::CheckReachedDestination(void)
 {
     bool retVal = false;
-    /**
-     * TODO: Add code to check if you've reached destination here.
-     */
-    double error_r = sqrt((destPose.x - currPose.x)*(destPose.x - currPose.x) + (destPose.y - currPose.y)*(destPose.y - currPose.y));
+
+    double deltaX = destPose.x - currPose.x;
+    double deltaY = destPose.y - currPose.y;
+    double error_r = sqrt(square(deltaX) + square(deltaY));
 
     if (error_r < 1){
         retVal = true;
@@ -120,15 +121,10 @@ void Robot::DriveToPoint(void)
 {
     if(robotState == ROBOT_DRIVE_TO_POINT)
     {
-        double error_r = sqrt((destPose.x - currPose.x)*(destPose.x - currPose.x) + (destPose.y - currPose.y)*(destPose.y - currPose.y));
-        double error_theta = atan2((destPose.y - currPose.y), (destPose.x - currPose.x)) - currPose.theta;
-
-        if (error_theta > PI){
-            error_theta -= 2 * PI;
-        }
-        if (error_theta < -PI){
-            error_theta += 2 * PI;
-        }
+        double deltaX = destPose.x - currPose.x;
+        double deltaY = destPose.y - currPose.y;
+        double error_r = sqrt(square(deltaX) + square(deltaY));
+        double error_theta = atan2((deltaY), (deltaX)) - currPose.theta;
 
         double left_effort = 0;
         double right_effort = 0;
@@ -136,12 +132,26 @@ void Robot::DriveToPoint(void)
         double r_kp = 20;
         double theta_kp = 2000;
 
+        //Forward component of the proportional controller
         left_effort += error_r * r_kp*abs(cos(error_theta));
-        right_effort += error_r * r_kp*abs(cos(error_theta));
+        right_effort += error_r * r_kp*abs(cos(error_theta)); 
+        /*
+            Note: The abs(cos(error_theta)) is multiplied in to 
+            help weight the robot to drive less if it is facing 
+            far away from its target. This works because if the 
+            theta error is high, it will return a small out from 
+            cos (like 0.1) which will scale the romi's forward 
+            velocity until it aligns better with its goal.
+        
+        */
 
+        //Turning component of the proportional controller
         left_effort -= error_theta * theta_kp;
         right_effort += error_theta * theta_kp;
 
+
+        //Caps the max left and right motor efforts to limit 
+        //the romi speed to reduce spliage and increase reliability
         if (abs(left_effort) > 150){
             if(left_effort > 0){
                 left_effort = 150;
@@ -158,14 +168,8 @@ void Robot::DriveToPoint(void)
             }
         }
 
-        
-
-        /**
-         * TODO: Add your IK algorithm here. 
-         */
 
 #ifdef __NAV_DEBUG__
-        // Print useful stuff here.
         /*
         TeleplotPrint("x", currPose.x);
         TeleplotPrint("y", currPose.y);
@@ -173,22 +177,8 @@ void Robot::DriveToPoint(void)
         TeleplotPrint("error_theta", error_theta);
         */
 #endif
-
+        //Sends the efforts determined by the controller to the motors
         chassis.SetMotorEfforts(left_effort, right_effort);
-        /*
-        left_effort = 40;
-        right_effort = 70;
-
-        if(circle == 1 && currPose.theta > 0){
-            EnterIdleState();
-        } else{
-            chassis.SetMotorEfforts(left_effort, right_effort);
-        }
-        
-        TeleplotPrint("x", currPose.x);
-        TeleplotPrint("y", currPose.y);
-        TeleplotPrint("theta", currPose.theta);
-        */
     }
 }
 

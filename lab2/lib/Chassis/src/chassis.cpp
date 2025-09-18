@@ -141,18 +141,13 @@ void Chassis::SetMotorEfforts(int16_t left, int16_t right)
 Twist Chassis::CalcOdomFromWheelMotion(void)
 {
     Twist velocity;
-    /**
-     * TODO: Calculate velocities from wheel motion, which are held in leftMotor.spped and rightMotor.speed.
-     * Note that you might want to calculate the deltas instead of speeds (to save some floating point maths). 
-     * 
-     * In that case, you should return a Pose instead of a Twist.
-     */
-     //Should be DONE
 
-     // actually x 
-     velocity.u = (leftMotor.speed/LEFT_TICKS_PER_CM + rightMotor.speed/RIGHT_TICKS_PER_CM)/2.0; //average between the left and right motor; is a difference in cm distance since previous loop
-        // these are not actually velocities, they are position deltas
-     // actually theta
+    //The forward distance delta traveled by the romi in last 20ms time period
+    //leftMotor.speed returns a tick delta since the last call (20ms)
+    //This is converted with the LEFT_TICKS_PER_CM constant to determine the linear distance the left side traveled
+     velocity.u = (leftMotor.speed/LEFT_TICKS_PER_CM + rightMotor.speed/RIGHT_TICKS_PER_CM)/2.0;
+
+    //The angular distance delta rotated by the romi in the last 20ms time period
      velocity.omega = (rightMotor.speed/RIGHT_TICKS_PER_CM - leftMotor.speed/LEFT_TICKS_PER_CM)/(ROBOT_RADIUS*2.0);
 
 #ifdef __NAV_DEBUG__
