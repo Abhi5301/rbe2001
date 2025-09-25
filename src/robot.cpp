@@ -1,9 +1,13 @@
 #include "robot.h"
 
+
 void Robot::InitializeRobot(void)
 {
     chassis.InititalizeChassis();
 
+    servoPin5.attach();
+
+    servoPin5.setTargetPos(1500);
     //SetDestination(dests_pose[dests_i]);
     //robotState = ROBOT_DRIVE_TO_POINT;
 }
