@@ -13,6 +13,7 @@ protected:
     {
         ROBOT_IDLE,
         ROBOT_DRIVE_TO_POINT,
+        ROBOT_TASK,
     };
     ROBOT_STATE robotState = ROBOT_IDLE;
 

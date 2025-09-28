@@ -17,6 +17,7 @@ void setup()
 #endif
   delay(3);
   robot.InitializeRobot();
+
 }
 
 void loop() 
