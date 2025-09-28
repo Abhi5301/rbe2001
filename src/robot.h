@@ -1,6 +1,8 @@
 #pragma once
 
 #include "chassis.h"
+#include "servo32u4.h"
+
 
 class Robot
 {
@@ -19,7 +21,9 @@ protected:
 
     /* Define the chassis*/
     Chassis chassis;
-
+    
+    Servo32U4Pin5 servoPin5;
+    
     // For managing key presses
     String keyString;
 
