@@ -53,15 +53,17 @@ public:
 
     int servo5target;
     int servo6target;
-    int bluemotortarget;
+    int bluemotortarget; 
 
     int task_i = 0;
 
     //servo5 - slider: 0, 2, 4, 6, 8, 10, 12, 14
     //servo6 - grabber: 1, 5, 9, 13
     //blue: 3, 7, 11, 15
-    
-    int taskPos[16] = {2000, }; //task positions
+
+    int servo5Pos[16] = {};
+    int servo6Pos[16] = {};
+    int bluePos[16] = {};
     
 
 protected:

@@ -37,29 +37,25 @@ bool Robot::doNextTask(){
     //servo5 - slider: 0, 2, 4, 6, 8, 10, 12, 14
     //servo6 - grabber: 1, 5, 9, 13
     //blue: 3, 7, 11, 15
-    if(task_i == (0 || 2 || 4 || 6 || 8 || 10 || 12 || 14)){
-        //its a servo5 - slider movement
-        servo5target = taskPos[task_i];
-        servoPin5.setTargetPos(servo5target);
-        servoPin5.update();
-        delay(500);
-    }
-    if (task_i == (1 || 5 || 9 || 13)){
-        //its a servo 6 - grabber movement
-        servo6target = taskPos[task_i];
-        servoPin6.setTargetPos(servo6target);
-        servoPin6.update();
-        delay(500);
-    }
-    if (task_i == (3 || 7 || 11 || 15)){
-        //its a blue motor move
-        bluemotortarget = taskPos[task_i];
-    }
-    
+
     if (task_i == 16)
     {
         return true;
     }
+    
+    servo5target = servo5Pos[task_i];
+    servo6target = servo6Pos[task_i];
+    bluemotortarget = bluePos[task_i];
+
+    servoPin5.setTargetPos(servo5target);
+    servoPin6.setTargetPos(servo6target);
+
+    servoPin5.update();
+    servoPin6.update();
+
+
+    delay(500);
+    
     
     task_i++;
     return false;
@@ -102,6 +98,8 @@ void Robot::RobotLoop(void)
             DriveToPoint();
             if(CheckReachedDestination()){ HandleDestination();};
         }
+
+
     }
     
 }
