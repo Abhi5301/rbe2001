@@ -2,7 +2,7 @@
 
 #include "chassis.h"
 #include "servo32u4.h"
-
+#include "BlueMotor.h"
 
 class Robot
 {
@@ -21,8 +21,13 @@ protected:
 
     /* Define the chassis*/
     Chassis chassis;
+
+    EventTimer timerTask;
     
     Servo32U4Pin5 servoPin5;
+    Servo32U4Pin6 servoPin6;
+    BlueMotor blueMotor;
+    
     
     // For managing key presses
     String keyString;
@@ -45,6 +50,18 @@ public:
     // const Pose dests_pose[1] = {Pose(50,-200,0)};
     int dests_i = 0;
     int circle = 0;
+
+    int servo5target;
+    int servo6target;
+    int bluemotortarget;
+
+    int task_i = 0;
+
+    //servo5 - slider: 0, 2, 4, 6, 8, 10, 12, 14
+    //servo6 - grabber: 1, 5, 9, 13
+    //blue: 3, 7, 11, 15
+    
+    int taskPos[16] = {2000, }; //task positions
     
 
 protected:
@@ -57,4 +74,7 @@ protected:
     void DriveToPoint(void);
     bool CheckReachedDestination(void);
     void HandleDestination(void);
+    bool checkReached(void);
+    bool doNextTask(void);
+
 };

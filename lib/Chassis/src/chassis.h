@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #include "chassis-params.h"
+#include <event_timer.h>
 #include "utils.h"
 
 class Chassis
