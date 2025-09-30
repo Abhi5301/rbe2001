@@ -9,9 +9,7 @@ void Robot::InitializeRobot(void)
     servoPin5.attach();
     servoPin6.attach();
     blueMotor.setup();
-    blueMotor.reset();
 
-    servoPin5.setTargetPos(1500);
     SetDestination(dests_pose[dests_i]);
     robotState = ROBOT_TASK;
 }
@@ -77,6 +75,19 @@ void Robot::RobotLoop(void)
      //then doing a porportional loop based off of blue motors current 
      //position and also the bluemotortarget global variable which will 
      //house the blue motor's target position
+
+
+    //Servo 5 testing
+    // servoPin5.setTargetPos(1500);
+    // servoPin5.update();
+
+    //Servo 6 testing
+    // servoPin6.setTargetPos(1500);
+    // servoPin6.update();
+
+    //Blue motor testing
+    // blueMotor.setEffort(200);
+
 
     Twist velocity;
     if(chassis.ChassisLoop(velocity))
