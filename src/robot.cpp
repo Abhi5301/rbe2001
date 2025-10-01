@@ -25,7 +25,7 @@ void Robot::EnterIdleState(void)
 
 bool Robot::checkReached() {
     bool returnVal = false;
-    if(abs(bluemotortarget - blueMotor.getPosition()) < 5){
+    if(abs(bluemotortarget - blueMotor.getPosition()) < 10){
         return true;
     }
 
@@ -76,7 +76,7 @@ void Robot::RobotLoop(void)
     Twist velocity;
     if(chassis.ChassisLoop(velocity))
     {
-        while(digitalRead(14) == HIGH){
+        if(digitalRead(14) == HIGH){
         robotState = ROBOT_TASK;
         timerTask.start(50);
         }
@@ -88,12 +88,12 @@ void Robot::RobotLoop(void)
         {
             if(checkReached()){
                 if(doNextTask()){   //to do out auton, set the target positions in the array in robot.h for the coresponding actuators
-                    SetDestination(dests_pose[dests_i]);
-                    robotState == ROBOT_DRIVE_TO_POINT;
+                    EnterIdleState();
+                    //SetDestination(dests_pose[dests_i]);
+                    //robotState == ROBOT_DRIVE_TO_POINT;
                 }
             }
-            timerTask.start(2000);
-            
+            timerTask.start(3000);
 
         } else if(robotState == ROBOT_DRIVE_TO_POINT) {
             DriveToPoint();
@@ -101,8 +101,8 @@ void Robot::RobotLoop(void)
         }
 
         //blue motor p control loop here
-        double kp = 2.0;
-        int base = 0;
+        double kp = 8.0;
+        int base = 125;
 
         currentPos = blueMotor.getPosition();
         int error = (bluemotortarget-currentPos);
@@ -111,6 +111,11 @@ void Robot::RobotLoop(void)
         servoPin5.update();
         servoPin12.update();
 
-        Serial.println(currentPos);
+        Serial.print("      target: ");
+        Serial.print(bluemotortarget);
+        Serial.print("      task: ");
+        Serial.println(task_i);
+        Serial.print("      ticks: ");
+        Serial.print(blueMotor.getPosition());
     }
 }

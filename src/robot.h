@@ -68,16 +68,16 @@ public:
 
     #define slideIn 2000
     #define slideOut 1200
-    #define closeGrip 2500
-    #define openGrip 500
+    #define closeGrip 1950
+    #define openGrip 1300
     #define ground 0
-    #define shelf1 1400
-    #define shelf2 1700
-    #define shelf3 2000
+    #define shelf1 1150
+    #define shelf2 1350
+    #define shelf3 1600
 
-    int servo5Pos[16] = {slideOut,  slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn};
-    int servo12Pos[16] = {openGrip,  closeGrip,  closeGrip,  closeGrip,  closeGrip,  openGrip,   openGrip,   openGrip,   openGrip,   closeGrip,  closeGrip,  closeGrip,  closeGrip,  openGrip,   openGrip,   openGrip};
-    int bluePos[16] =   {ground,    ground,     ground,     shelf1,     shelf1,     shelf1,     shelf1,     shelf2,     shelf2,     shelf2,     shelf2,     shelf3,     shelf3,     shelf3,     shelf3,     ground};
+    int servo5Pos[16] =     {slideOut,  slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn};
+    int servo12Pos[16] =    {openGrip,  closeGrip,  closeGrip,  closeGrip,  closeGrip,  openGrip,   openGrip,   openGrip,   openGrip,   closeGrip,  closeGrip,  closeGrip,  closeGrip,  openGrip,   openGrip,   openGrip};
+    int bluePos[16] =       {ground,    ground,     ground,     shelf1,     shelf1,     shelf1,     shelf1,     shelf2,     shelf2,     shelf2,     shelf2,     shelf3,     shelf3,     shelf3,     shelf3,     ground};
     
 
 protected:
