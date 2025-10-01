@@ -25,9 +25,8 @@ protected:
     EventTimer timerTask;
     
     Servo32U4Pin5 servoPin5;
-    Servo32U4Pin6 servoPin6;
+    Servo32U4Pin12 servoPin12;
     BlueMotor blueMotor;
-    
     
     // For managing key presses
     String keyString;
@@ -51,9 +50,15 @@ public:
     int dests_i = 0;
     int circle = 0;
 
+    //Servo targets
     int servo5target;
-    int servo6target;
+    int servo12target;
     int bluemotortarget; 
+
+    //Blue motor target
+    long currentPos = 0;
+    long oldPosition = 0;
+
 
     int task_i = 0;
 
@@ -61,9 +66,18 @@ public:
     //servo6 - grabber: 1, 5, 9, 13
     //blue: 3, 7, 11, 15
 
-    int servo5Pos[16] = {};
-    int servo6Pos[16] = {};
-    int bluePos[16] = {};
+    #define slideIn 2000
+    #define slideOut 1200
+    #define closeGrip 2500
+    #define openGrip 500
+    #define ground 0
+    #define shelf1 1400
+    #define shelf2 1700
+    #define shelf3 2000
+
+    int servo5Pos[16] = {slideOut,  slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn};
+    int servo12Pos[16] = {openGrip,  closeGrip,  closeGrip,  closeGrip,  closeGrip,  openGrip,   openGrip,   openGrip,   openGrip,   closeGrip,  closeGrip,  closeGrip,  closeGrip,  openGrip,   openGrip,   openGrip};
+    int bluePos[16] =   {ground,    ground,     ground,     shelf1,     shelf1,     shelf1,     shelf1,     shelf2,     shelf2,     shelf2,     shelf2,     shelf3,     shelf3,     shelf3,     shelf3,     ground};
     
 
 protected:

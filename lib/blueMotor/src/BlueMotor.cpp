@@ -23,7 +23,8 @@ void BlueMotor::setup()
     ICR1 = 400;
     OCR1C = 0;
 
-    attachInterrupt(digitalPinToInterrupt(ENCA), isr, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(ENCA), interruptA, RISING);
+    attachInterrupt(digitalPinToInterrupt(ENCB), interruptB, RISING);
     reset();
 }
 
@@ -44,9 +45,22 @@ void BlueMotor::reset()
 }
 
 
-void BlueMotor::isr()
+void BlueMotor::interruptA()
 {
-    count++;
+    if(digitalRead(ENCB)) {
+        count--;
+    } else {
+        count++;
+    }
+}
+
+void BlueMotor::interruptB()
+{
+    if(digitalRead(ENCA)) {
+        count++;
+    } else {
+        count--;
+    }
 }
 
 void BlueMotor::setEffort(int effort)

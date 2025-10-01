@@ -7,11 +7,12 @@ void Robot::InitializeRobot(void)
 
     //Initializing motors
     servoPin5.attach();
-    servoPin6.attach();
+    servoPin12.attach();
     blueMotor.setup();
+    blueMotor.reset();
 
-    SetDestination(dests_pose[dests_i]);
-    robotState = ROBOT_TASK;
+    servoPin5.setTargetPos(slideIn);
+    servoPin12.setTargetPos(openGrip);
 }
 
 void Robot::EnterIdleState(void)
@@ -23,9 +24,9 @@ void Robot::EnterIdleState(void)
 }
 
 bool Robot::checkReached() {
-    bool returnVal = true;
-    if(abs(bluemotortarget - blueMotor.getPosition()) > 20){
-        return false;
+    bool returnVal = false;
+    if(abs(bluemotortarget - blueMotor.getPosition()) < 5){
+        return true;
     }
 
     return returnVal;
@@ -42,17 +43,12 @@ bool Robot::doNextTask(){
     }
     
     servo5target = servo5Pos[task_i];
-    servo6target = servo6Pos[task_i];
+    servo12target = servo12Pos[task_i];
     bluemotortarget = bluePos[task_i];
 
     servoPin5.setTargetPos(servo5target);
-    servoPin6.setTargetPos(servo6target);
+    servoPin12.setTargetPos(servo12target);
 
-    servoPin5.update();
-    servoPin6.update();
-
-
-    delay(500);
     
     
     task_i++;
@@ -75,23 +71,16 @@ void Robot::RobotLoop(void)
      //then doing a porportional loop based off of blue motors current 
      //position and also the bluemotortarget global variable which will 
      //house the blue motor's target position
-
-
-    //Servo 5 testing
-    // servoPin5.setTargetPos(1500);
-    // servoPin5.update();
-
-    //Servo 6 testing
-    // servoPin6.setTargetPos(1500);
-    // servoPin6.update();
-
-    //Blue motor testing
-    // blueMotor.setEffort(200);
-
+    
 
     Twist velocity;
     if(chassis.ChassisLoop(velocity))
     {
+        while(digitalRead(14) == HIGH){
+        robotState = ROBOT_TASK;
+        timerTask.start(50);
+        }
+        
         // We do FK regardless of state
         UpdatePose(velocity);
          
@@ -99,10 +88,11 @@ void Robot::RobotLoop(void)
         {
             if(checkReached()){
                 if(doNextTask()){   //to do out auton, set the target positions in the array in robot.h for the coresponding actuators
+                    SetDestination(dests_pose[dests_i]);
                     robotState == ROBOT_DRIVE_TO_POINT;
                 }
             }
-            timerTask.start(50);
+            timerTask.start(2000);
             
 
         } else if(robotState == ROBOT_DRIVE_TO_POINT) {
@@ -110,7 +100,17 @@ void Robot::RobotLoop(void)
             if(CheckReachedDestination()){ HandleDestination();};
         }
 
+        //blue motor p control loop here
+        double kp = 2.0;
+        int base = 0;
 
+        currentPos = blueMotor.getPosition();
+        int error = (bluemotortarget-currentPos);
+        blueMotor.setEffort(error*kp + base);
+
+        servoPin5.update();
+        servoPin12.update();
+
+        Serial.println(currentPos);
     }
-    
 }
