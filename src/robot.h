@@ -71,8 +71,8 @@ public:
     #define closeGrip 1950
     #define openGrip 1300
     #define ground 0
-    #define shelf1 1150
-    #define shelf2 1350
+    #define shelf1 1050
+    #define shelf2 1230
     #define shelf3 1600
 
     int servo5Pos[16] =     {slideOut,  slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn};

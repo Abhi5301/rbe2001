@@ -25,7 +25,7 @@ void Robot::EnterIdleState(void)
 
 bool Robot::checkReached() {
     bool returnVal = false;
-    if(abs(bluemotortarget - blueMotor.getPosition()) < 10){
+    if(abs(bluemotortarget - blueMotor.getPosition()) < 20){
         return true;
     }
 
@@ -78,7 +78,7 @@ void Robot::RobotLoop(void)
     {
         if(digitalRead(14) == HIGH){
         robotState = ROBOT_TASK;
-        timerTask.start(50);
+        timerTask.start(2000);
         }
         
         // We do FK regardless of state
@@ -93,7 +93,7 @@ void Robot::RobotLoop(void)
                     //robotState == ROBOT_DRIVE_TO_POINT;
                 }
             }
-            timerTask.start(3000);
+            timerTask.start(2000);
 
         } else if(robotState == ROBOT_DRIVE_TO_POINT) {
             DriveToPoint();
@@ -101,12 +101,15 @@ void Robot::RobotLoop(void)
         }
 
         //blue motor p control loop here
-        double kp = 8.0;
-        int base = 125;
+        double kp = 1;  //1.5
+        double ki = 0.05; //%5-%10 of Kp
+        int base = 150; //175
+        int sumError = 0;
 
         currentPos = blueMotor.getPosition();
         int error = (bluemotortarget-currentPos);
-        blueMotor.setEffort(error*kp + base);
+        sumError += error; //Current error + previous error
+        blueMotor.setEffort(((error*kp) + (sumError*ki)) + base);
 
         servoPin5.update();
         servoPin12.update();
