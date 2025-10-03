@@ -23,8 +23,8 @@ void BlueMotor::setup()
     ICR1 = 400;
     OCR1C = 0;
 
-    attachInterrupt(digitalPinToInterrupt(ENCA), interruptA, RISING);
-    attachInterrupt(digitalPinToInterrupt(ENCB), interruptB, RISING);
+    attachInterrupt(digitalPinToInterrupt(ENCA), interruptA, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(ENCB), interruptB, CHANGE);
     reset();
 }
 
@@ -47,19 +47,36 @@ void BlueMotor::reset()
 
 void BlueMotor::interruptA()
 {
-    if(digitalRead(ENCB)) {
-        count--;
-    } else {
-        count++;
+    if(digitalRead(ENCA)){  //A rising edge
+        if(digitalRead(ENCB)) { //If B is high
+            count--;
+        } else {
+            count++;
+        }
+    } else {    //A falling edge
+        if(digitalRead(ENCB)) { //If B is low
+            count++;
+        } else {
+            count--;
+        }
     }
+    
 }
 
 void BlueMotor::interruptB()
 {
-    if(digitalRead(ENCA)) {
-        count++;
-    } else {
-        count--;
+    if(digitalRead(ENCB)){  //B rising edge
+        if(digitalRead(ENCA)) { //If A is high
+            count++;
+        } else {
+            count--;
+        }
+    } else {    //B falling edge
+        if(digitalRead(ENCA)) { //If A is low
+            count--;
+        } else {
+            count++;
+        }
     }
 }
 

@@ -45,8 +45,9 @@ public:
     void RobotLoop(void);
 
     const int dests_size = 5;
-    const Pose dests_pose[6] = {Pose(50, -25, 0), Pose(-40, 10, 0), Pose(25, 20, 0), Pose(-15, -20, 0), Pose(-40, -10, 0), Pose(0, 0, 0)};
+    // const Pose dests_pose[6] = {Pose(50, -25, 0), Pose(-40, 10, 0), Pose(25, 20, 0), Pose(-15, -20, 0), Pose(-40, -10, 0), Pose(0, 0, 0)};
     // const Pose dests_pose[1] = {Pose(50,-200,0)};
+    const Pose dests_pose[2] = {Pose(-50,-200,0), Pose(-100,0,0)};
     int dests_i = 0;
     int circle = 0;
 
@@ -59,6 +60,7 @@ public:
     long currentPos = 0;
     long oldPosition = 0;
 
+    int sumError = 0;
 
     int task_i = 0;
 
@@ -71,9 +73,9 @@ public:
     #define closeGrip 1950
     #define openGrip 1300
     #define ground 0
-    #define shelf1 1150
-    #define shelf2 1350
-    #define shelf3 1600
+    #define shelf1 1700
+    #define shelf2 2075
+    #define shelf3 2500
 
     int servo5Pos[16] =     {slideOut,  slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn};
     int servo12Pos[16] =    {openGrip,  closeGrip,  closeGrip,  closeGrip,  closeGrip,  openGrip,   openGrip,   openGrip,   openGrip,   closeGrip,  closeGrip,  closeGrip,  closeGrip,  openGrip,   openGrip,   openGrip};
