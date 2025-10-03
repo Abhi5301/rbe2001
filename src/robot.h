@@ -59,6 +59,8 @@ public:
     long currentPos = 0;
     long oldPosition = 0;
 
+    double ki = 0.05; //%5-%10 of Kp
+
 
     int task_i = 0;
 
@@ -71,9 +73,9 @@ public:
     #define closeGrip 1950
     #define openGrip 1300
     #define ground 0
-    #define shelf1 1050
-    #define shelf2 1230
-    #define shelf3 1600
+    #define shelf1 1700
+    #define shelf2 2100
+    #define shelf3 2500
 
     int servo5Pos[16] =     {slideOut,  slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn,    slideOut,   slideOut,   slideIn,    slideIn};
     int servo12Pos[16] =    {openGrip,  closeGrip,  closeGrip,  closeGrip,  closeGrip,  openGrip,   openGrip,   openGrip,   openGrip,   closeGrip,  closeGrip,  closeGrip,  closeGrip,  openGrip,   openGrip,   openGrip};

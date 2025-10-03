@@ -102,14 +102,14 @@ void Robot::RobotLoop(void)
 
         //blue motor p control loop here
         double kp = 1;  //1.5
-        double ki = 0.05; //%5-%10 of Kp
-        int base = 150; //175
+        
+        // int base = 150; //175
         int sumError = 0;
 
         currentPos = blueMotor.getPosition();
         int error = (bluemotortarget-currentPos);
         sumError += error; //Current error + previous error
-        blueMotor.setEffort(((error*kp) + (sumError*ki)) + base);
+        blueMotor.setEffort(((error*kp) + (sumError*ki)));
 
         servoPin5.update();
         servoPin12.update();
