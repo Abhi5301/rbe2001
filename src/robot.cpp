@@ -3,7 +3,7 @@
 
 void Robot::InitializeRobot(void)
 {
-    // chassis.InititalizeChassis();
+    chassis.InititalizeChassis();
 
     //Initializing motors
     servoPin5.attach();
@@ -25,7 +25,7 @@ void Robot::EnterIdleState(void)
 
 bool Robot::checkReached() {
     bool returnVal = false;
-    if(abs(bluemotortarget - blueMotor.getPosition()) < 20){
+    if(abs(bluemotortarget - blueMotor.getPosition()) < 30){
         return true;
     }
 
@@ -39,6 +39,10 @@ bool Robot::doNextTask(){
 
     if (task_i == 16)
     {
+        chassis.SetMotorEfforts(100, -100);
+        delay(850);
+        chassis.SetMotorEfforts(-130, -80);
+        delay(4600);
         return true;
     }
     
@@ -75,7 +79,7 @@ void Robot::RobotLoop(void)
     Twist velocity;
     if(digitalRead(14) == HIGH){
         robotState = ROBOT_TASK;
-        timerTask.start(2000);
+        timerTask.start(800);
     }
 
     if(robotState == ROBOT_TASK)
@@ -83,13 +87,13 @@ void Robot::RobotLoop(void)
         if(timerTask.CheckExpired()){
             if(checkReached()){
                 if(doNextTask()){   //to do out auton, set the target positions in the array in robot.h for the coresponding actuators
-                    // EnterIdleState();
-                    chassis.InititalizeChassis();
-                    HandleDestination();
-                    robotState = ROBOT_DRIVE_TO_POINT;
+                    EnterIdleState();
+                    //HandleDestination();
+                    // robotState = ROBOT_DRIVE_TO_POINT;
+                    exit(0);
                 }
             }
-            timerTask.start(1000);
+            timerTask.start(800);
         }
         //blue motor p control loop here
         double kp = 1.0;  //1.5
@@ -100,11 +104,7 @@ void Robot::RobotLoop(void)
         if(abs(error) < 200) sumError += error; //only do i term if if within 200 ticks of target
         else sumError = 0; //otherwise reset
         int effort = (error*kp) + (sumError*ki);
-
-        if(effort > 0){     //Only add base when going up
-            effort += base;
-        }
-
+        if(effort > 0) effort += base;
         blueMotor.setEffort(effort);
 
         servoPin5.update();

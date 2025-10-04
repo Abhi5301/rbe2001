@@ -60,7 +60,7 @@ public:
     long currentPos = 0;
     long oldPosition = 0;
 
-    double ki = 0.0001;
+    double ki = 0.001;
     long long sumError = 0;
 
     int task_i = 0;
