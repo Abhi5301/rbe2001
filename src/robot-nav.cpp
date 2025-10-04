@@ -25,39 +25,6 @@ void Robot::UpdatePose(const Twist& twist)
         currPose.theta += 2*M_PI;
     }
 
-    //First order calculation
-    currPose1.theta += twist.omega;
-    currPose1.x += twist.u * cos(currPose1.theta);
-    currPose1.y += twist.u * sin(currPose1.theta);
-
-    if(currPose1.theta > M_PI){
-        currPose1.theta -= 2*M_PI;
-    }
-    if(currPose1.theta < -M_PI){
-        currPose1.theta += 2*M_PI;
-    }
-
-    //Instantanous Circle Calculation
-
-    if(twist.omega == 0){
-        currPoseCir.x += twist.u * cos(currPoseCir.theta);
-        currPoseCir.y += twist.u * sin(currPoseCir.theta);
-    } else {
-        float R = (twist.u)/(twist.omega);  
-        float startTheta = currPoseCir.theta;
-        currPoseCir.theta += twist.omega;
-        currPoseCir.x += R * (sin(currPoseCir.theta) - sin(startTheta));
-        currPoseCir.y += R * (cos(startTheta) - cos(currPoseCir.theta));
-
-        if(currPoseCir.theta > M_PI){
-            currPoseCir.theta -= 2*M_PI;
-        }
-        if(currPoseCir.theta < -M_PI){
-            currPoseCir.theta += 2*M_PI;
-        }
-    }
-    
-
 
 #ifdef __NAV_DEBUG__
     
@@ -65,25 +32,6 @@ void Robot::UpdatePose(const Twist& twist)
     TeleplotPrint("secOrdY", currPose.y);
     TeleplotPrint("secOrdTheta", currPose.theta);
 
-    TeleplotPrint("firOrdX", currPose1.x);
-    TeleplotPrint("firOrdY", currPose1.y);
-    TeleplotPrint("firOrdTheta", currPose1.theta);
-
-    TeleplotPrint("cirX", currPoseCir.x);
-    TeleplotPrint("cirY", currPoseCir.y);
-    TeleplotPrint("cirTheta", currPoseCir.theta);
-    
-    TeleplotPrint("secOrdX - firOrderX", currPose.x - currPose1.x);
-    TeleplotPrint("secOrdY - firOrderY", currPose.y - currPose1.y);
-    TeleplotPrint("secOrdTheta - firOrderTheta", currPose.theta - currPose1.theta);
-
-    TeleplotPrint("secOrdX - cirX", currPose.x - currPoseCir.x);
-    TeleplotPrint("secOrdY - cirY", currPose.y - currPoseCir.y);
-    TeleplotPrint("secOrdTheta - cirTheta", currPose.theta - currPoseCir.theta);
-
-    TeleplotPrint("firOrdX - cirX", currPose1.x - currPoseCir.x);
-    TeleplotPrint("firOrdY - cirY", currPose1.y - currPoseCir.y);
-    TeleplotPrint("firOrdTheta - cirTheta", currPose1.theta - currPoseCir.theta);
 #endif
 
 }
@@ -108,17 +56,15 @@ void Robot::SetDestination(const Pose& dest)
 
 bool Robot::CheckReachedDestination(void)
 {
-    bool retVal = false;
-
     double deltaX = destPose.x - currPose.x;
     double deltaY = destPose.y - currPose.y;
     double error_r = sqrt(square(deltaX) + square(deltaY));
 
-    if (error_r < 1){
-        retVal = true;
+    if (error_r < 3){
+        return true;
     }
 
-    return retVal;
+    return false;
 }
 
 void Robot::DriveToPoint(void)
@@ -182,12 +128,12 @@ void Robot::DriveToPoint(void)
 
 
 #ifdef __NAV_DEBUG__
-        /*
+        
         TeleplotPrint("x", currPose.x);
         TeleplotPrint("y", currPose.y);
         TeleplotPrint("error_r", error_r);
         TeleplotPrint("error_theta", error_theta);
-        */
+        
 #endif
         //Outputs the efforts determined by the controller to the motors
         chassis.SetMotorEfforts(left_effort, right_effort);
@@ -196,11 +142,10 @@ void Robot::DriveToPoint(void)
 
 void Robot::HandleDestination(void)
 {
-    EnterIdleState();
     if(dests_i == dests_size) {
-        robotState = ROBOT_IDLE;
+        EnterIdleState();
     } else {
-        dests_i++;
         SetDestination(dests_pose[dests_i]);
+        dests_i++;
     }  
 }

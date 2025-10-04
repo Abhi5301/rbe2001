@@ -44,10 +44,10 @@ public:
     void InitializeRobot(void);
     void RobotLoop(void);
 
-    const int dests_size = 5;
+    const int dests_size = 2;
     // const Pose dests_pose[6] = {Pose(50, -25, 0), Pose(-40, 10, 0), Pose(25, 20, 0), Pose(-15, -20, 0), Pose(-40, -10, 0), Pose(0, 0, 0)};
     // const Pose dests_pose[1] = {Pose(50,-200,0)};
-    const Pose dests_pose[2] = {Pose(-50,-200,0), Pose(-100,0,0)};
+    const Pose dests_pose[2] = {Pose(-10,20,0), Pose(-40,-10,0)};
     int dests_i = 0;
     int circle = 0;
 
@@ -60,7 +60,8 @@ public:
     long currentPos = 0;
     long oldPosition = 0;
 
-    int sumError = 0;
+    double ki = 0.0001;
+    long long sumError = 0;
 
     int task_i = 0;
 

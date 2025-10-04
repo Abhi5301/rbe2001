@@ -3,7 +3,7 @@
 
 void Robot::InitializeRobot(void)
 {
-    chassis.InititalizeChassis();
+    // chassis.InititalizeChassis();
 
     //Initializing motors
     servoPin5.attach();
@@ -50,7 +50,6 @@ bool Robot::doNextTask(){
     servoPin12.setTargetPos(servo12target);
 
     
-    
     task_i++;
     return false;
     
@@ -74,42 +73,39 @@ void Robot::RobotLoop(void)
     
 
     Twist velocity;
-    if(chassis.ChassisLoop(velocity))
-    {
-        if(digitalRead(14) == HIGH){
+    if(digitalRead(14) == HIGH){
         robotState = ROBOT_TASK;
         timerTask.start(2000);
-        }
-        
-        // We do FK regardless of state
-        UpdatePose(velocity);
-         
-        if(robotState == ROBOT_TASK && timerTask.CheckExpired())
-        {
+    }
+
+    if(robotState == ROBOT_TASK)
+    {
+        if(timerTask.CheckExpired()){
             if(checkReached()){
                 if(doNextTask()){   //to do out auton, set the target positions in the array in robot.h for the coresponding actuators
                     // EnterIdleState();
-                    SetDestination(dests_pose[dests_i]);
-                    robotState == ROBOT_DRIVE_TO_POINT;
+                    chassis.InititalizeChassis();
+                    HandleDestination();
+                    robotState = ROBOT_DRIVE_TO_POINT;
                 }
             }
-            timerTask.start(2000);
-
-        } else if(robotState == ROBOT_DRIVE_TO_POINT) {
-            DriveToPoint();
-            if(CheckReachedDestination()){ HandleDestination();};
+            timerTask.start(1000);
         }
-
         //blue motor p control loop here
-        double kp = 2;  //1.5
-        double ki = 0.01; //%5-%10 of Kp
+        double kp = 1.0;  //1.5
+        int base = 170;
         
-        int base = 0; //175
-
         currentPos = blueMotor.getPosition();
         int error = (bluemotortarget-currentPos);
-        sumError += error; //Current error + previous error
-        blueMotor.setEffort(((error*kp) + (sumError*ki)) + base);
+        if(abs(error) < 200) sumError += error; //only do i term if if within 200 ticks of target
+        else sumError = 0; //otherwise reset
+        int effort = (error*kp) + (sumError*ki);
+
+        if(effort > 0){     //Only add base when going up
+            effort += base;
+        }
+
+        blueMotor.setEffort(effort);
 
         servoPin5.update();
         servoPin12.update();
@@ -117,12 +113,21 @@ void Robot::RobotLoop(void)
         Serial.print("      target: ");
         Serial.print(bluemotortarget);
         Serial.print("      task: ");
-        Serial.print(task_i); //ln
+        Serial.print(task_i);
         Serial.print("      ticks: ");
         Serial.print(blueMotor.getPosition());
         Serial.print("      effort: ");
-        Serial.println((error*kp) + (sumError*ki));
+        Serial.print((error*kp) + (sumError*ki));
         Serial.print("      state: ");
-        Serial.print(robotState);
+        Serial.println(robotState);
+
+    } else if(robotState == ROBOT_DRIVE_TO_POINT) {
+        if(chassis.ChassisLoop(velocity)){
+            //We do fk regardless of state
+            UpdatePose(velocity);
+
+            DriveToPoint();
+            if(CheckReachedDestination()){ HandleDestination();};
+        }
     }
 }
